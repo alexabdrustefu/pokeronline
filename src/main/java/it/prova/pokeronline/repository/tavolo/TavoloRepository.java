@@ -19,5 +19,6 @@ public interface TavoloRepository extends CrudRepository<Tavolo, Long>, CustomTa
 	
 	
 	
+	
 
 }
