@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "tavolo")
@@ -22,10 +24,10 @@ public class Tavolo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
-	@Column(name = "esperienaMin")
-	private Integer esperienaMin;
+	@Column(name = "esperienzaMin")
+	private Integer esperienzaMin;
 	@Column(name = "cifraMin")
-	private Double cifraMin;
+	private Double cifraMinima;
 	@Column(name = "denominazione")
 	private String denominazione;
 	@Column(name = "dataCreazione")
@@ -42,38 +44,46 @@ public class Tavolo {
 	public Tavolo() {
 	}
 
-	public Tavolo(Long id, Integer esperienaMin, Double cifraMin, String denominazione, LocalDate dataCreazione,
+	public Tavolo(Long id, Integer esperienzaMin, Double cifraMinima, String denominazione, LocalDate dataCreazione,
 			Utente utenteCreazione, Set<Utente> giocatori) {
 		super();
 		this.id = id;
-		this.esperienaMin = esperienaMin;
-		this.cifraMin = cifraMin;
+		this.esperienzaMin = esperienzaMin;
+		this.cifraMinima = cifraMinima;
 		this.denominazione = denominazione;
 		this.dataCreazione = dataCreazione;
 		this.utenteCreazione = utenteCreazione;
 		this.giocatori = giocatori;
 	}
 
-	public Tavolo(Long id, Integer esperienaMin, Double cifraMin, String denominazione, LocalDate dataCreazione,
+	public Tavolo(Long id, Integer esperienzaMin, Double cifraMinima, String denominazione, LocalDate dataCreazione,
 			Utente utenteCreazione) {
 		super();
 		this.id = id;
-		this.esperienaMin = esperienaMin;
-		this.cifraMin = cifraMin;
+		this.esperienzaMin = esperienzaMin;
+		this.cifraMinima = cifraMinima;
 		this.denominazione = denominazione;
 		this.dataCreazione = dataCreazione;
 		this.utenteCreazione = utenteCreazione;
 	}
 
-	public Tavolo(Integer esperienaMin, Double cifraMin, String denominazione, LocalDate dataCreazione,
+	public Tavolo(Integer esperienzaMin, Double cifraMinima, String denominazione, LocalDate dataCreazione,
 			Utente utenteCreazione, Set<Utente> giocatori) {
 		super();
-		this.esperienaMin = esperienaMin;
-		this.cifraMin = cifraMin;
+		this.esperienzaMin = esperienzaMin;
+		this.cifraMinima = cifraMinima;
 		this.denominazione = denominazione;
 		this.dataCreazione = dataCreazione;
 		this.utenteCreazione = utenteCreazione;
 		this.giocatori = giocatori;
+	}
+
+	public Tavolo(Long id, @NotNull(message = "{esperienzaMin.notblank}") Integer esperienzaMin,
+			@NotNull(message = "{cifraMinima.notblank}") Double cifraMinima,
+			@NotBlank(message = "{denominazione.notblank}") String denominazione, LocalDate dataCreazione) {
+		this.cifraMinima = cifraMinima;
+		this.denominazione = denominazione;
+		this.dataCreazione = dataCreazione;
 	}
 
 	// get e set
@@ -85,20 +95,20 @@ public class Tavolo {
 		this.id = id;
 	}
 
-	public Integer getEsperienaMin() {
-		return esperienaMin;
+	public Integer getEsperienzaMin() {
+		return esperienzaMin;
 	}
 
-	public void setEsperienaMin(Integer esperienaMin) {
-		this.esperienaMin = esperienaMin;
+	public void setEsperienzaMin(Integer esperienaMin) {
+		this.esperienzaMin = esperienaMin;
 	}
 
-	public Double getCifraMin() {
-		return cifraMin;
+	public Double getCifraMinima() {
+		return cifraMinima;
 	}
 
-	public void setCifraMin(Double cifraMin) {
-		this.cifraMin = cifraMin;
+	public void setCifraMinima(Double cifraMinima) {
+		this.cifraMinima = cifraMinima;
 	}
 
 	public String getDenominazione() {

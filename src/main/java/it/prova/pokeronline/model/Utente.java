@@ -1,6 +1,6 @@
 package it.prova.pokeronline.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,8 +15,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 
 
@@ -37,7 +39,7 @@ public class Utente {
 	@Column(name = "password")
 	private String password;
 	@Column(name = "dateCreated")
-	private Date dateCreated;
+	private LocalDate dateCreated;
 
 	@Enumerated(EnumType.STRING)
 	private StatoUtente stato;
@@ -52,7 +54,35 @@ public class Utente {
 	public Utente() {
 
 	}
+	
+	public Utente(Long id, String nome, String cognome, String username, String password, LocalDate dateCreated,
+			StatoUtente stato, Set<Ruolo> ruoli) {
+		super();
+		this.id = id;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.username = username;
+		this.password = password;
+		this.dateCreated = dateCreated;
+		this.stato = stato;
+		this.ruoli = ruoli;
+	}
+
 	//metodi get e set
+
+	public Utente(Long id, @NotBlank(message = "{nome.notblank}") String nome,
+			@NotBlank(message = "{cognome.notblank}") String cognome,
+			@NotBlank(message = "{username.notblank}") @Size(min = 3, max = 15, message = "Il valore inserito '${validatedValue}' deve essere lungo tra {min} e {max} caratteri") String username,
+			@NotBlank(message = "{password.notblank}") @Size(min = 8, max = 15, message = "Il valore inserito deve essere lungo tra {min} e {max} caratteri") String password,
+			@NotNull LocalDate dateCreated, StatoUtente stato) {
+		this.id = id;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.username = username;
+		this.password = password;
+		this.dateCreated = dateCreated;
+		this.stato = stato;
+	}
 
 	public Long getId() {
 		return id;
@@ -94,11 +124,11 @@ public class Utente {
 		this.password = password;
 	}
 
-	public Date getDateCreated() {
+	public LocalDate getDateCreated() {
 		return dateCreated;
 	}
 
-	public void setDateCreated(Date dateCreated) {
+	public void setDateCreated(LocalDate dateCreated) {
 		this.dateCreated = dateCreated;
 	}
 
