@@ -40,6 +40,10 @@ public class Utente {
 	private String password;
 	@Column(name = "dateCreated")
 	private LocalDate dateCreated;
+	@Column(name = "esperienzaAccumulata")
+	private Integer esperienzaAccumulata;
+	@Column(name = "creditoAccumulato")
+	private Integer creditoAccumulato;	
 
 	@Enumerated(EnumType.STRING)
 	private StatoUtente stato;
@@ -55,6 +59,25 @@ public class Utente {
 
 	}
 	
+	
+	public Utente(Long id, String nome, String cognome, String username, String password, LocalDate dateCreated,
+			Integer esperienzaAccumulata, Integer creditoAccumulato, StatoUtente stato, Set<Ruolo> ruoli,
+			Tavolo tavolo) {
+		super();
+		this.id = id;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.username = username;
+		this.password = password;
+		this.dateCreated = dateCreated;
+		this.esperienzaAccumulata = esperienzaAccumulata;
+		this.creditoAccumulato = creditoAccumulato;
+		this.stato = stato;
+		this.ruoli = ruoli;
+		this.tavolo = tavolo;
+	}
+
+
 	public Utente(Long id, String nome, String cognome, String username, String password, LocalDate dateCreated,
 			StatoUtente stato, Set<Ruolo> ruoli) {
 		super();
@@ -143,6 +166,38 @@ public class Utente {
 	public Set<Ruolo> getRuoli() {
 		return ruoli;
 	}
+	
+	
+	
+	public Integer getEsperienzaAccumulata() {
+		return esperienzaAccumulata;
+	}
+
+
+	public void setEsperienzaAccumulata(Integer esperienzaAccumulata) {
+		this.esperienzaAccumulata = esperienzaAccumulata;
+	}
+
+
+	public Integer getCreditoAccumulato() {
+		return creditoAccumulato;
+	}
+
+
+	public void setCreditoAccumulato(Integer creditoAccumulato) {
+		this.creditoAccumulato = creditoAccumulato;
+	}
+
+
+	public Tavolo getTavolo() {
+		return tavolo;
+	}
+
+
+	public void setTavolo(Tavolo tavolo) {
+		this.tavolo = tavolo;
+	}
+
 
 	public void setRuoli(Set<Ruolo> ruoli) {
 		this.ruoli = ruoli;
