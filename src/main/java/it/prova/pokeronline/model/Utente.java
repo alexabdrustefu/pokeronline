@@ -14,7 +14,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+
 
 @Entity
 @Table(name = "utente")
@@ -37,10 +41,12 @@ public class Utente {
 
 	@Enumerated(EnumType.STRING)
 	private StatoUtente stato;
-
 	@ManyToMany
 	@JoinTable(name = "utente_ruolo", joinColumns = @JoinColumn(name = "utente_id", referencedColumnName = "ID"), inverseJoinColumns = @JoinColumn(name = "ruolo_id", referencedColumnName = "ID"))
 	private Set<Ruolo> ruoli = new HashSet<>(0);
+	@ManyToOne
+	@JoinColumn(name="tavolo_id")
+	private Tavolo tavolo;
 	//costruttori
 
 	public Utente() {
@@ -111,7 +117,19 @@ public class Utente {
 	public void setRuoli(Set<Ruolo> ruoli) {
 		this.ruoli = ruoli;
 	}
-	
-	
+	public boolean isAdmin() {
+		for (Ruolo ruoloItem : ruoli) {
+			if (ruoloItem.getCodice().equals(Ruolo.ROLE_ADMIN))
+				return true;
+		}
+		return false;
+	}
 
+	public boolean isAttivo() {
+		return this.stato != null && this.stato.equals(StatoUtente.ATTIVO);
+	}
+
+	public boolean isDisabilitato() {
+		return this.stato != null && this.stato.equals(StatoUtente.DISABILITATO);
+	}
 }
