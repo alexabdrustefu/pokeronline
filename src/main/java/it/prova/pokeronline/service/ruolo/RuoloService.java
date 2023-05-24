@@ -4,7 +4,6 @@ import java.util.List;
 
 import it.prova.pokeronline.model.Ruolo;
 
-
 public interface RuoloService {
 	public List<Ruolo> listAll();
 

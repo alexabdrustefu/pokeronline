@@ -1,6 +1,5 @@
 package it.prova.pokeronline.service.utente;
 
-
 import java.util.List;
 
 import it.prova.pokeronline.model.Tavolo;

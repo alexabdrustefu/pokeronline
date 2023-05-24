@@ -1,34 +1,41 @@
 package it.prova.pokeronline.service.tavolo;
 
+import java.time.LocalDate;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.repository.tavolo.TavoloRepository;
 import it.prova.pokeronline.repository.utente.UtenteRepository;
 import it.prova.pokeronline.service.utente.UtenteService;
-import it.prova.pokeronline.web.exception.CreditoInsufficenteException;
-import it.prova.pokeronline.web.exception.TavoloNotFoundException;
-import it.prova.pokeronline.web.exception.UtenteInAltroTavoloException;
+import it.prova.pokeronline.web_api.exception.CreditoInsufficenteException;
+import it.prova.pokeronline.web_api.exception.TavoloNotFoundException;
+import it.prova.pokeronline.web_api.exception.UtenteInAltroTavoloException;
 
 @Service
+@Transactional(readOnly = true)
 public class TavoloServiceImpl implements TavoloService {
+
 	@Autowired
-	TavoloRepository repository;
+	private TavoloRepository repository;
+
 	@Autowired
-	UtenteRepository utenteRepository;
+	private UtenteService utenteService;
+
 	@Autowired
-	UtenteService utenteService;
+	private UtenteRepository utenteRepository;
 
 	@Override
-	public List<Tavolo> listAll() {
-		return (List<Tavolo>) repository.findAll();// cast in una lista di tavoli
+	public List<Tavolo> listAllTavoli() {
+		return (List<Tavolo>) repository.findAll();
 	}
 
 	@Override
@@ -54,6 +61,7 @@ public class TavoloServiceImpl implements TavoloService {
 	}
 
 	@Override
+	@Transactional
 	public Tavolo aggiorna(Tavolo tavoloInstance) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		Utente utenteLoggato = utenteService.findByUsername(username);
@@ -64,11 +72,16 @@ public class TavoloServiceImpl implements TavoloService {
 	}
 
 	@Override
+	@Transactional
 	public Tavolo inserisciNuovo(Tavolo tavoloInstance) {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		tavoloInstance.setUtenteCreazione(utenteService.findByUsername(username));
+		tavoloInstance.setDataCreazione(LocalDate.now());
 		return repository.save(tavoloInstance);
 	}
 
 	@Override
+	@Transactional
 	public void rimuovi(Long idToRemove) {
 		repository.deleteById(idToRemove);
 
@@ -76,9 +89,10 @@ public class TavoloServiceImpl implements TavoloService {
 
 	@Override
 	public List<Tavolo> findByEsperienzaMinimaLessThan() {
+
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		Utente utenteLoggato = utenteService.findByUsername(username);
-		Integer esperienzaAccumulata = utenteLoggato.getEsperienzaAccumulata();
+		Double esperienzaAccumulata = utenteLoggato.getEsperienzaAccumulata();
 
 		return repository.findByEsperienzaMinLessThan(esperienzaAccumulata);
 	}
@@ -89,31 +103,31 @@ public class TavoloServiceImpl implements TavoloService {
 		Tavolo tavoloReload = repository.findById(id).orElse(null);
 
 		if (tavoloReload == null) {
-			throw new TavoloNotFoundException("tavolo non esistente");
+			throw new TavoloNotFoundException("Il tavolo in cui si cerca di entrare non esiste");
 		}
 
 		Utente utenteLoggato = utenteService.findByUsername(username);
 
-		if (tavoloReload.getCifraMinima() > utenteLoggato.getCreditoAccumulato()) {
-			throw new CreditoInsufficenteException("Credito insufficente");
+		if (tavoloReload.getCifraMinima() > utenteLoggato.getCreditoResiduo()) {
+			throw new CreditoInsufficenteException("Credito insufficente Per giocare");
 		}
 
 		List<Tavolo> listaTavoli = (List<Tavolo>) repository.findAll();
 
 		for (Tavolo elementoTavolo : listaTavoli) {
 			if (elementoTavolo.getId() != id) {
-				for (Utente elementoUtente : elementoTavolo.getUtenti())
+				for (Utente elementoUtente : elementoTavolo.getGiocatori())
 					if (elementoUtente.getId().equals(utenteLoggato.getId())) {
-						throw new UtenteInAltroTavoloException("sei presente in un altro tavolo non puoi entrare");
+						throw new UtenteInAltroTavoloException("Stai giocando ad un altro tavolo non puoi unirti");
 					}
 			}
 		}
 
-		tavoloReload.getUtenti().add(utenteLoggato);
+		tavoloReload.getGiocatori().add(utenteLoggato);
 
 		boolean maggiore = false;
 		double segno = Math.random();
-		Integer credito = 0;
+		Double credito = 0.0;
 
 		if (segno >= 0.5) {
 			maggiore = true;
@@ -122,17 +136,17 @@ public class TavoloServiceImpl implements TavoloService {
 		}
 
 		if (maggiore) {
-			credito = (int) (utenteLoggato.getCreditoAccumulato() + Math.random() * 1000);
+			credito = (utenteLoggato.getCreditoResiduo() + Math.random() * 1000);
 		} else {
-			credito = (int) (utenteLoggato.getCreditoAccumulato() - Math.random() * 1000);
+			credito = (utenteLoggato.getCreditoResiduo() - Math.random() * 1000);
 		}
 
-		if (utenteLoggato.getCreditoAccumulato() <= 0) {
-			utenteLoggato.setCreditoAccumulato(0);
+		if (utenteLoggato.getCreditoResiduo() <= 0) {
+			utenteLoggato.setCreditoResiduo(0.0);
 			throw new CreditoInsufficenteException("Credito insufficente");
 		}
-
-		utenteLoggato.setCreditoAccumulato(credito);
+		
+		utenteLoggato.setCreditoResiduo(credito);
 		utenteRepository.save(utenteLoggato);
 
 		repository.save(tavoloReload);
@@ -141,6 +155,14 @@ public class TavoloServiceImpl implements TavoloService {
 	@Override
 	public List<Tavolo> findByExample(Tavolo example) {
 		return repository.findByExample(example);
+	}
+
+	@Override
+	public Page<Tavolo> findByExampleNativeWithPagination(Tavolo example, Integer pageNo, Integer pageSize,
+	String sortBy) {
+	return repository.findByExampleNativeWithPagination(example.getDenominazione(), example.getEsperienzaMin(),
+	example.getCifraMinima(), example.getDataCreazione(),
+	PageRequest.of(pageNo, pageSize, Sort.by(sortBy)));
 	}
 
 }

@@ -37,17 +37,17 @@ public class CustomUtenteRepositoryImpl implements CustomUtenteRepository{
 			whereClauses.add(" u.cognome like :cognome ");
 			paramaterMap.put("cognome", "%" + example.getCognome() + "%");
 		}
-		if (example.getDateCreated() != null) {
-			whereClauses.add(" u.dateCreated >= :dateCreated ");
-			paramaterMap.put("dateCreated", example.getDateCreated());
+		if (example.getDataCreazione() != null) {
+			whereClauses.add(" u.dataCreazione >= :dataCreazione ");
+			paramaterMap.put("dataCreazione", example.getDataCreazione());
 		}
 		if (example.getEsperienzaAccumulata() != null) {
 			whereClauses.add(" u.esperienzaAccumulata >= :esperienzaAccumulata ");
 			paramaterMap.put("esperienzaAccumulata", example.getEsperienzaAccumulata());
 		}
-		if (example.getCreditoAccumulato() != null) {
-			whereClauses.add(" u.creditoAccumulato >= :creditoAccumulato ");
-			paramaterMap.put("creditoAccumulato", example.getCreditoAccumulato());
+		if (example.getCreditoResiduo() != null) {
+			whereClauses.add(" u.creditoResiduo >= :creditoResiduo ");
+			paramaterMap.put("creditoResiduo", example.getCreditoResiduo());
 		}
 		if (example.getStato() != null) {
 			whereClauses.add("u.stato = :stato ");

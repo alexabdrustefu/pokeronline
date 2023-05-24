@@ -27,7 +27,6 @@ public class RuoloServiceImpl implements RuoloService {
 	@Transactional
 	public void aggiorna(Ruolo ruoloInstance) {
 		ruoloRepository.save(ruoloInstance);
-
 	}
 
 	@Transactional

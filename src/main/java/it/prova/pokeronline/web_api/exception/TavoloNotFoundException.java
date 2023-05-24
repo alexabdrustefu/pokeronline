@@ -1,4 +1,4 @@
-package it.prova.pokeronline.web.exception;
+package it.prova.pokeronline.web_api.exception;
 
 public class TavoloNotFoundException extends RuntimeException{
 

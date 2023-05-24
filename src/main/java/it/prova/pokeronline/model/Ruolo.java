@@ -12,9 +12,8 @@ import javax.persistence.Table;
 public class Ruolo {
 
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
-	public static final String PLAYER = "PLAYER";
-	public static final String SPECIAL_PLAYER = "SPECIAL_PLAYER";
-
+	public static final String ROLE_SPECIAL_PLAYER = "ROLE_SPECIAL_PLAYER";
+	public static final String ROLE_PLAYER = "ROLE_PLAYER";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,13 +25,23 @@ public class Ruolo {
 	private String codice;
 
 	public Ruolo() {
+		super();
 	}
 
 	public Ruolo(Long id) {
+		super();
 		this.id = id;
 	}
 
+	public Ruolo(Long id, String descrizione, String codice) {
+		super();
+		this.id = id;
+		this.descrizione = descrizione;
+		this.codice = codice;
+	}
+
 	public Ruolo(String descrizione, String codice) {
+		super();
 		this.descrizione = descrizione;
 		this.codice = codice;
 	}
@@ -65,12 +74,14 @@ public class Ruolo {
 		return ROLE_ADMIN;
 	}
 
-	public static String getPlayer() {
-		return PLAYER;
+	public static String getRoleSpecialPlayer() {
+		return ROLE_SPECIAL_PLAYER;
 	}
 
-	public static String getSpecialPlayer() {
-		return SPECIAL_PLAYER;
+	public static String getRolePlayer() {
+		return ROLE_PLAYER;
 	}
+
+	
 
 }

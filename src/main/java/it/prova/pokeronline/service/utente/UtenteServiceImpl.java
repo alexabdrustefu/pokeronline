@@ -13,8 +13,8 @@ import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.repository.tavolo.TavoloRepository;
 import it.prova.pokeronline.repository.utente.UtenteRepository;
-import it.prova.pokeronline.web.exception.TavoloNotFoundException;
-import it.prova.pokeronline.web.exception.UtenteInNessunTavoloException;
+import it.prova.pokeronline.web_api.exception.TavoloNotFoundException;
+import it.prova.pokeronline.web_api.exception.UtenteInNessunTavoloException;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,7 +25,7 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
+	
 	@Autowired
 	private TavoloRepository tavoloRepository;
 
@@ -58,9 +58,9 @@ public class UtenteServiceImpl implements UtenteService {
 	public Utente inserisciNuovo(Utente utenteInstance) {
 		utenteInstance.setStato(StatoUtente.CREATO);
 		utenteInstance.setPassword(passwordEncoder.encode(utenteInstance.getPassword()));
-		utenteInstance.setDateCreated(LocalDate.now());
-		utenteInstance.setCreditoAccumulato(0);
-		utenteInstance.setEsperienzaAccumulata(0);
+		utenteInstance.setDataCreazione(LocalDate.now());
+		utenteInstance.setCreditoResiduo(0.0);
+		utenteInstance.setEsperienzaAccumulata(0.0);		
 		return repository.save(utenteInstance);
 	}
 
@@ -102,12 +102,12 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Override
 	public Tavolo dammiLastGame(Utente utente) {
-
+		
 		Tavolo result = tavoloRepository.findByGiocatoriId(utente.getId());
-
-		if (result == null)
-			throw new UtenteInNessunTavoloException("Utente non in gioco");
-
+		
+		if(result == null)
+			throw new UtenteInNessunTavoloException("L'utente non è presente in nessun tavolo");
+		
 		return result;
 	}
 
@@ -115,12 +115,14 @@ public class UtenteServiceImpl implements UtenteService {
 	@Transactional
 	public void abbandonaPartita(Utente utente) {
 		Tavolo result = tavoloRepository.findByGiocatoriId(utente.getId());
-
-		if (result == null) {
-			throw new TavoloNotFoundException("Non puoi abbandonare la partita perche non sei in un tavolo");
+		
+		if(result==null) {
+			throw new TavoloNotFoundException("Impossibile abbandonare la partita, non sei in nessun tavolo!");
 		}
 		utente.setEsperienzaAccumulata(utente.getEsperienzaAccumulata() + 1);
-		result.getUtenti().remove(utente);
+		result.getGiocatori().remove(utente);
 	}
+
+
 
 }
