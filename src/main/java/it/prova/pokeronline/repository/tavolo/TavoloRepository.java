@@ -24,12 +24,12 @@ public interface TavoloRepository
 
 	@Query(value = "SELECT t.* " + "FROM tavolo t "
 			+ "WHERE ((:denominazione IS NULL OR LOWER(t.denominazione) LIKE %:denominazione%)  "
-			+ "AND (:esperienzaminima IS NULL OR t.esperienzaminima > :esperienzaminima) "
+			+ "AND (:esperienzaminima IS NULL OR esperienzaMin > :esperienzaminima) "
 			+ "AND (:ciframinima IS NULL OR t.ciframinima >= :ciframinima) "
 			+ "AND (:datacreazione IS NULL OR t.datacreazione >= :datacreazione)) "
 			+ "ORDER BY t.id ASC", countQuery = "SELECT COUNT(*) " + "FROM tavolo t "
 			+ "WHERE ((:denominazione IS NULL OR LOWER(t.denominazione) LIKE %:denominazione%)  "
-			+ "AND (:esperienzaminima IS NULL OR t.esperienzaminima > :esperienzaminima) "
+			+ "AND (:esperienzaminima IS NULL OR esperienzaMin > :esperienzaminima) "
 			+ "AND (:ciframinima IS NULL OR t.ciframinima >= :ciframinima) "
 			+ "AND (:datacreazione IS NULL OR t.datacreazione >= :datacreazione))", nativeQuery = true)
 			Page<Tavolo> findByExampleNativeWithPagination(@Param("denominazione") String denominazione,

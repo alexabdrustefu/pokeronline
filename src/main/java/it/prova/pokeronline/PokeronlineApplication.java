@@ -51,7 +51,7 @@ public class PokeronlineApplication implements CommandLineRunner{
 		}
 		
 		if (utenteServiceInstance.findByUsername("SpecialPlayer") == null) {
-			Utente specialPlayer = new Utente("Francesco", "Paradiso", "SpecialPlayer", "SpecialPlayer", LocalDate.now());
+			Utente specialPlayer = new Utente("special", "special", "SpecialPlayer", "SpecialPlayer", LocalDate.now());
 			specialPlayer.getRuoli().add(ruoloServiceInstance.cercaPerDescrizioneECodice("Special User", Ruolo.ROLE_SPECIAL_PLAYER));
 			specialPlayer.setCreditoResiduo(0.0);
 			specialPlayer.setEsperienzaAccumulata(0.0);
@@ -61,7 +61,7 @@ public class PokeronlineApplication implements CommandLineRunner{
 		}
 		
 		if (utenteServiceInstance.findByUsername("ClassicPlayer") == null) {
-			Utente classicPlayer = new Utente("Luigi", "Iorio", "ClassicPlayer", "ClassicPlayer", LocalDate.now());
+			Utente classicPlayer = new Utente("classic", "classic", "ClassicPlayer", "ClassicPlayer", LocalDate.now());
 			classicPlayer.getRuoli().add(ruoloServiceInstance.cercaPerDescrizioneECodice("Classic User", Ruolo.ROLE_PLAYER));
 			classicPlayer.setCreditoResiduo(0.0);
 			classicPlayer.setEsperienzaAccumulata(0.0);
