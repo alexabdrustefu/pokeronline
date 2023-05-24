@@ -94,6 +94,7 @@ public class TavoloController {
 
 		Page<Tavolo> entityPageResults = tavoloService.findByExampleNativeWithPagination(example.buildFromModel(),
 				pageNo, pageSize, sortBy);
+		
 
 		return new ResponseEntity<Page<TavoloDTO>>(TavoloDTO.fromModelPageToDTOPage(entityPageResults), HttpStatus.OK);
 	}
