@@ -19,7 +19,6 @@ public interface TavoloRepository
 	Tavolo findByIdEager(@Param("id") Long idTavolo);
 
 	List<Tavolo> findByEsperienzaMinLessThan(Double esperienza);
-
 	Tavolo findByGiocatoriId(Long id);
 
 	@Query(value = "SELECT t.* " + "FROM tavolo t "

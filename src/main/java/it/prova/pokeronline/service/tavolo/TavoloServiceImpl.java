@@ -11,13 +11,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.prova.pokeronline.dto.TavoloDTO;
 import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.repository.tavolo.TavoloRepository;
 import it.prova.pokeronline.repository.utente.UtenteRepository;
 import it.prova.pokeronline.service.utente.UtenteService;
 import it.prova.pokeronline.web_api.exception.CreditoInsufficenteException;
+import it.prova.pokeronline.web_api.exception.CreditoMinimoInsufficienteException;
+import it.prova.pokeronline.web_api.exception.EsperienzaMinimaInsufficienteException;
+import it.prova.pokeronline.web_api.exception.IdNotNullForInsertException;
 import it.prova.pokeronline.web_api.exception.TavoloNotFoundException;
+import it.prova.pokeronline.web_api.exception.UtenteGiocatoreGiaSedutoException;
 import it.prova.pokeronline.web_api.exception.UtenteInAltroTavoloException;
 
 @Service
@@ -95,9 +100,9 @@ public class TavoloServiceImpl implements TavoloService {
 		Double esperienzaAccumulata = utenteLoggato.getEsperienzaAccumulata();
 		return repository.findByEsperienzaMinLessThan(esperienzaAccumulata);
 	}
-
-	@Override
-	@Transactional
+	//metodo con bug
+	//@Override
+	/*@Transactional
 	public void gioca(Long id, String username) {
 		Tavolo tavoloReload = repository.findById(id).orElse(null);
 
@@ -149,7 +154,7 @@ public class TavoloServiceImpl implements TavoloService {
 		utenteRepository.save(utenteLoggato);
 
 		repository.save(tavoloReload);
-	}
+	}*/
 
 	@Override
 	public List<Tavolo> findByExample(Tavolo example) {
@@ -171,6 +176,106 @@ public class TavoloServiceImpl implements TavoloService {
 		return repository.findByExampleNativeWithPagination(example.getDenominazione(), example.getEsperienzaMin(),
 		example.getCifraMinima(), example.getDataCreazione(),
 		PageRequest.of(pageNo, pageSize, Sort.by(sortBy)));
+	}
+	@Override
+	@Transactional
+	public Tavolo sieditiAlTavolo(Long idTavolo) {
+
+		Tavolo tavolo = this.caricaSingoloTavolo(idTavolo);
+		if (tavolo == null) {
+			throw new TavoloNotFoundException("Il tavolo che stai cercando non esiste");
+		}
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		// estraggo le info dal principal
+		Utente utenteLoggato = utenteService.findByUsername(username);
+
+		if (utenteLoggato.getCreditoResiduo() == null) {
+			utenteLoggato.setCreditoResiduo(0D);
+		}
+		if (utenteLoggato.getCreditoResiduo() < tavolo.getCifraMinima()) {
+			throw new CreditoMinimoInsufficienteException("Non hai credito sufficiente per sederti a questo tavolo");
+		}
+		if (utenteLoggato.getEsperienzaAccumulata() == null) {
+			utenteLoggato.setEsperienzaAccumulata(0D);
+		}
+		if (utenteLoggato.getEsperienzaAccumulata() < tavolo.getEsperienzaMin()) {
+			throw new EsperienzaMinimaInsufficienteException(
+					"Non hai abbastanza esperienza per sederti a questo tavolo");
+		}
+		if (tavolo.getGiocatori().contains(utenteLoggato)) {
+			throw new UtenteGiocatoreGiaSedutoException("Attenzione! Sei già seduto a questo tavolo");
+		}
+
+		List<Tavolo> listaTavoli = this.listAllTavoli();
+		for (Tavolo tavoloItem : listaTavoli) {
+			if (tavoloItem.getGiocatori().contains(utenteLoggato)) {
+				throw new UtenteGiocatoreGiaSedutoException("Attenzione! Sei già seduto ad un altro tavolo");
+			}
+		}
+
+		tavolo.getGiocatori().add(utenteLoggato);
+		return tavolo;
+
+	}
+	@Override
+	@Transactional
+	public void gioca(Long idTavolo, String username) {
+
+		Tavolo tavolo = repository.findById(idTavolo).orElse(null);
+
+		if (tavolo == null)
+			throw new IdNotNullForInsertException("");
+
+		username = SecurityContextHolder.getContext().getAuthentication().getName();
+		Utente utenteInSessione = utenteService.findByUsername(username);
+
+		if (!tavolo.getGiocatori().contains(utenteInSessione))
+			throw new TavoloNotFoundException("Eh bro");
+
+		if (utenteInSessione.getCreditoResiduo() == null || utenteInSessione.getCreditoResiduo() == 0d) {
+			throw new CreditoInsufficenteException("Poveraccio");
+		}
+
+		double segno = Math.random();
+		if (segno < 0.5)
+			segno = segno * -1;
+		int somma = (int) (Math.random() * 500);
+		int totale = (int) (segno * somma);
+
+		Integer esperienzaGuadagnata = 0;
+
+		if (totale > 0) {
+			esperienzaGuadagnata += 5;
+			if (totale > 200)
+				esperienzaGuadagnata += 6;
+			if (totale > 400)
+				esperienzaGuadagnata += 7;
+			if (totale > 499)
+				esperienzaGuadagnata += 8;
+		}
+
+		if (totale <= 0) {
+			esperienzaGuadagnata += 4;
+			if (totale < -200)
+				esperienzaGuadagnata += 3;
+			if (totale < -400)
+				esperienzaGuadagnata += 2;
+			if (totale < -499)
+				esperienzaGuadagnata += 1;
+		}
+
+		utenteInSessione.setEsperienzaAccumulata(esperienzaGuadagnata + utenteInSessione.getEsperienzaAccumulata());
+
+		Double creditoDaInserire = utenteInSessione.getCreditoResiduo() + totale;
+
+		if (creditoDaInserire < 0) {
+			creditoDaInserire = 0D;
+		}
+
+		utenteInSessione.setCreditoResiduo(creditoDaInserire);
+
+
 	}
 
 }

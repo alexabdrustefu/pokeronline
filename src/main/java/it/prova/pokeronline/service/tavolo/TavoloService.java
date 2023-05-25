@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import it.prova.pokeronline.dto.TavoloDTO;
 import it.prova.pokeronline.model.Tavolo;
 
 public interface TavoloService {
@@ -26,11 +27,14 @@ public interface TavoloService {
 	
 	List<Tavolo> findByEsperienzaMinimaLessThan();
 	
-	void gioca(Long id, String username);
+	public Tavolo sieditiAlTavolo(Long id);
+	
 	
 	public List<Tavolo> findByExample(Tavolo example);
 
 	Page<Tavolo> findByExampleNativeWithPagination(Tavolo example, Integer pageNo, Integer pageSize,
 			String sortBy);
-
+	
+	void gioca(Long id, String username);
+	
 }
