@@ -122,7 +122,11 @@ public class UtenteServiceImpl implements UtenteService {
 		utente.setEsperienzaAccumulata(utente.getEsperienzaAccumulata() + 1);
 		result.getGiocatori().remove(utente);
 	}
-
+	@Override
+	@Transactional
+	public List<Utente> listaUtentiDateSbagliate() {
+		return repository.listaUtentiDateSbagliate();
+	}
 
 
 }

@@ -1,5 +1,6 @@
 package it.prova.pokeronline.repository.utente;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -22,5 +23,9 @@ public interface UtenteRepository extends CrudRepository<Utente, Long>, CustomUt
 	//caricamento eager, ovviamente si può fare anche con jpql
 	@EntityGraph(attributePaths = { "ruoli" })
 	Utente findByUsernameAndPasswordAndStato(String username,String password, StatoUtente stato);
+	@Query(value = "SELECT distinct u.*\r\n" + "	FROM utente u\r\n"
+			+ "	inner JOIN tavolo t ON u.id = t.utente_id\r\n"
+			+ "	WHERE t.datacreazione < u.dataregistrazione", nativeQuery = true)
+	List<Utente> listaUtentiDateSbagliate();
 
 }

@@ -28,7 +28,7 @@ import it.prova.pokeronline.web_api.exception.UtenteNotFoundException;
 
 @RestController
 @RequestMapping("/api/utente")
-public class UtenteControllo {
+public class UtenteController {
 	@Autowired
 	private UtenteService utenteService;
 
@@ -112,6 +112,13 @@ public class UtenteControllo {
 	public List<UtenteDTO> search(@RequestBody UtenteDTO example) {
 		return UtenteDTO.createUtenteDTOListFromModelList(utenteService.findByExample(example.buildUtenteModel(false)));
 	}
+	// MEV 3
+		@GetMapping("admin/listaUtentiDateSbagliate")
+		public List<UtenteDTO> listaUtentiDateSbagliate() {
+
+			List<Utente> utentiDateSbagliate = utenteService.listaUtentiDateSbagliate();
+			return UtenteDTO.createUtenteDTOListFromModelList(utentiDateSbagliate);
+		}
 	
 
 }

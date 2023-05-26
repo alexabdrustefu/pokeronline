@@ -1,6 +1,7 @@
 package it.prova.pokeronline.web_api;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -19,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.prova.pokeronline.dto.SvuotaTavoloDTO;
 import it.prova.pokeronline.dto.TavoloDTO;
 import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.service.tavolo.TavoloService;
 import it.prova.pokeronline.web_api.exception.IdNotNullForInsertException;
 import it.prova.pokeronline.web_api.exception.TavoloNotFoundException;
+import it.prova.pokeronline.web_api.exception.ValoreEsperienzaException;
 
 @RestController
 @RequestMapping("/api/tavolo")
@@ -98,5 +101,32 @@ public class TavoloController {
 
 		return new ResponseEntity<Page<TavoloDTO>>(TavoloDTO.fromModelPageToDTOPage(entityPageResults), HttpStatus.OK);
 	}
+	// MEV 1
+		@GetMapping("/specialGuest/listaTavoliConGiocatoreConSogliaEsperienza")
+		public List<TavoloDTO> listaTavoliConGiocatoreConSogliaEsperienza(
+				@Valid @RequestBody Map<String, Integer> rawValue) {
+
+			if (rawValue.get("sogliaMinima") == null || rawValue.get("sogliaMinima") <= 0)
+				throw new ValoreEsperienzaException("Inserire una cifra maggiore di 0");
+
+			return tavoloService.listaTavoliConSogliaEsperienzaGiocatore(rawValue.get("sogliaMinima"));
+
+		}
+
+		// MEV 2
+		@GetMapping("/admin/trovaTavoloConMassimaEsperienzaGiocatori")
+		public TavoloDTO trovaTavoloConMassimaEsperienzaGiocatori() {
+			return tavoloService.trovaTavoloConEsperienzaMassima();
+		}
+
+		// MEV 4
+		@PostMapping("/admin/svuotaTavoli")
+		public String svuotaTavoli(@RequestBody List<SvuotaTavoloDTO> tavoli) {
+
+			tavoloService.svotaUtenti(tavoli);
+
+			return "fatto";
+
+		}
 
 }

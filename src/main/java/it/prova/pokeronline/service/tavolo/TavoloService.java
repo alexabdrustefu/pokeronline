@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import it.prova.pokeronline.dto.SvuotaTavoloDTO;
 import it.prova.pokeronline.dto.TavoloDTO;
 import it.prova.pokeronline.model.Tavolo;
 
@@ -36,5 +37,11 @@ public interface TavoloService {
 			String sortBy);
 	
 	void gioca(Long id, String username);
+
+	public List<TavoloDTO> listaTavoliConSogliaEsperienzaGiocatore(Integer soglia);
+
+	public TavoloDTO trovaTavoloConEsperienzaMassima();
+
+	public String svotaUtenti(List<SvuotaTavoloDTO> tavoli);
 	
 }

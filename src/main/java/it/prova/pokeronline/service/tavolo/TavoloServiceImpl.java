@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.prova.pokeronline.dto.SvuotaTavoloDTO;
 import it.prova.pokeronline.dto.TavoloDTO;
 import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
@@ -23,7 +24,6 @@ import it.prova.pokeronline.web_api.exception.EsperienzaMinimaInsufficienteExcep
 import it.prova.pokeronline.web_api.exception.IdNotNullForInsertException;
 import it.prova.pokeronline.web_api.exception.TavoloNotFoundException;
 import it.prova.pokeronline.web_api.exception.UtenteGiocatoreGiaSedutoException;
-import it.prova.pokeronline.web_api.exception.UtenteInAltroTavoloException;
 
 @Service
 @Transactional(readOnly = true)
@@ -276,6 +276,29 @@ public class TavoloServiceImpl implements TavoloService {
 		utenteInSessione.setCreditoResiduo(creditoDaInserire);
 
 
+	}
+	@Override
+	@Transactional(readOnly = true)
+	public List<TavoloDTO> listaTavoliConSogliaEsperienzaGiocatore(Integer soglia) {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		Utente utenteInSessione = utenteService.findByUsername(username);
+
+		return TavoloDTO.createTavoloDTOListFromModelList(
+				repository.estraiTavoliConAlmenoUnUtenteAlDiSopraDiSoglia(utenteInSessione.getId(), soglia));
+	}
+
+	@Override
+	public TavoloDTO trovaTavoloConEsperienzaMassima() {
+		return TavoloDTO.buildTavoloDTOFromModel(repository.trovaTavoloConMassimaEsperienzaGiocatori());
+	}
+
+	@Override
+	public String svotaUtenti(List<SvuotaTavoloDTO> tavoli) {
+
+		repository.svuotaTavoliCreatiDaUtenti(SvuotaTavoloDTO.createListStringToDTO(tavoli));
+
+		return "fatto";
 	}
 
 }

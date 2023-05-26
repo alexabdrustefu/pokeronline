@@ -33,5 +33,8 @@ public interface UtenteService {
 	
 	public void abbandonaPartita(Utente utente);
 	
+	List<Utente> listaUtentiDateSbagliate();
+
+	
 
 }
